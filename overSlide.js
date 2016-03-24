@@ -116,6 +116,9 @@ $.extend($.fn, {
                 if(-moveX< -(childsWidth - wrapWidth)){
                     moveX=childsWidth - wrapWidth;
                 }
+                if(moveX<wrapWidth){
+                    moveX=0;
+                }
                 $.setTransitionTime($this, 0);
                 $.translate3d($this, -moveX);
                 oldX=-moveX;
