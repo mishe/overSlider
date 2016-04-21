@@ -1,45 +1,38 @@
 //水平滚动组件
 $.extend($.fn, {
-    overSlides: function (callback) {
-        $(this).each(function () {
-            $(this).overSlide(callback);
-        })
-    },
-    
-    //整体滚动
-    overSlide: function (options,callback) {
+    overSlide: function (options, callback) {
         var $this = $(this),
             $parent = $this.parent(),
             $child = $this.children(),
             wrapWidth = $parent.outerWidth(true),
-            wrapPadding=parseInt($this.css('padding-left')) + parseInt($this.css('padding-right')),
-            childsWidth=0,
+            wrapPadding = parseInt($this.css('padding-left')) + parseInt($this.css('padding-right')),
+            childsWidth = 0,
             minMove = 1,
-            defaultOptions={
-                move:true,
-                padding:20
+            defaultOptions = {
+                move: true,
+                padding: 20
             };
 
-        if($.type(options)=='function'){
-            callback=options;
-            options={};
-        }else {
-            options=$.extend(true,defaultOptions,options);
+        if ($.type(options) == 'function') {
+            callback = options;
+            options = {};
+        } else {
+            options = $.extend(true, defaultOptions, options);
         }
-        childsWidth+=options.padding;
-        $child.each(function(){
-            childsWidth+=$(this).outerWidth(true);
+        childsWidth += options.padding;
+        $child.each(function () {
+            childsWidth += $(this).outerWidth(true);
         });
-        childsWidth+=wrapPadding;
+        childsWidth += wrapPadding;
 
         var _bindEvent = function () {
-            var starty=startX=dx=dy=endTy=endTx= 0,
+            var starty = startX = dx = dy = endTy = endTx = 0,
                 oldDate;
             $this.addClass('bindedEvent').css('width', childsWidth);
             $parent.on('touchstart', function (e) {
-                oldDate=new Date();
+                oldDate = new Date();
                 starty = e.originalEvent.touches[0].clientY;
-                 if (!options.move) {
+                if (!options.move) {
                     startX = e.originalEvent.touches[0].clientX;
                 } else {
                     startX = e.originalEvent.touches[0].clientX - $this.offset().left;
@@ -56,31 +49,31 @@ $.extend($.fn, {
                     return;
                 }
                 event.preventDefault();
-                dx= endX - startX;
-                dy=endTy - starty;
-                if(options.move!==false){
-                    $.setTransitionTime($this, 0);
-                    $.translate3d($this, dx);
+                dx = endX - startX;
+                dy = endTy - starty;
+                if (options.move !== false) {
+                    $this.setTransitionTime(0);
+                    $this.translate3d(dx);
                 }
             });
 
             $parent.on('touchend', function (e) {
-                var newDate=new Date();
-                if((dx<12 || dx>-12) &&(dy>-12 || dy<12) && newDate-oldDate<200 && options.tap){
+                var newDate = new Date();
+                if ((dx < 12 || dx > -12) && (dy > -12 || dy < 12) && newDate - oldDate < 200 && options.tap) {
                     oldDate = newDate;
                     $parent.trigger('tap');
                 }
                 var offleft = $this.offset().left;
-                $.setTransitionTime($.this, 0.3);
+                $this.setTransitionTime(0.3);
                 if (offleft > 0) {
-                    $.translate3d($this, 0);
+                    $this.translate3d(0);
                 }
                 if (offleft < -(childsWidth - wrapWidth)) {
-                    $.translate3d($this, -(childsWidth - wrapWidth));
+                    $this.translate3d(-(childsWidth - wrapWidth));
                 }
                 callback && callback(dx, dy);
-                dx=0;
-                dy=0;
+                dx = 0;
+                dy = 0;
             });
         }
         if ($this.hasClass('bindedEvent')) {
@@ -96,57 +89,61 @@ $.extend($.fn, {
                 $parent.off();
             },
             reset: function () {
-                childsWidth=0;
-                wrapWidth=$this.parent().outerWidth(true);
+                childsWidth = 0;
+                wrapWidth = $this.parent().outerWidth(true);
 //                if(wrapWidth>screen.availWidth)
 //                    wrapWidth=screen.availWidth;
-                $this.children().each(function(){
-                    childsWidth+=$(this).outerWidth(true);
+                $this.children().each(function () {
+                    childsWidth += $(this).outerWidth(true);
                 });
-                childsWidth+=wrapPadding+options.padding;
+                childsWidth += wrapPadding + options.padding;
                 $this.css('width', childsWidth);
             },
             moveTo: function (num) {
-                var moveX=0;
-                $this.children().each(function(i){
-                    if(num-i>0){
-                        moveX+=$(this).outerWidth(true);
+                var moveX = 0;
+                $this.children().each(function (i) {
+                    if (num - i > 0) {
+                        moveX += $(this).outerWidth(true);
                     }
                 });
-                if(-moveX< -(childsWidth - wrapWidth)){
-                    moveX=childsWidth - wrapWidth;
+                if (-moveX < -(childsWidth - wrapWidth)) {
+                    moveX = childsWidth - wrapWidth;
                 }
-                if(moveX<wrapWidth){
-                    moveX=0;
+                if (moveX < wrapWidth) {
+                    moveX = 0;
                 }
-                $.setTransitionTime($this, 0);
-                $.translate3d($this, -moveX);
-                oldX=-moveX;
+                $this.setTransitionTime(0);
+                $this.translate3d(-moveX);
+                oldX = -moveX;
             }
         }
     },
-    //单个滚动
-    slideBanner:function(pageObj,autoscroll){
-        var slideObj=$(this),
-            $child =$(this).children(),
+    overSlides: function (callback) {
+        $(this).each(function () {
+            $(this).overSlide(callback);
+        })
+    },
+    bannerSlide: function (pageObj, autoscroll) {
+        var slideObj = $(this),
+            $child = $(this).children(),
             slideWidth = $child.outerWidth(true),
             countPage = $child.length,
-            slideCurPage= 1,
+            slideCurPage = 1,
             returnObj,
             timeout;
-        $child.css('width',$child.outerWidth(true));
+        $child.css('width', $child.outerWidth(true));
         pageObj.eq(0).addClass('active').siblings().removeClass('active');
 
-        function autoScrollBanner(){
-            if(autoscroll!==0){
+        function autoScrollBanner() {
+            if (autoscroll !== 0) {
                 clearInterval(timeout);
-                timeout=setInterval(function(){
+                timeout = setInterval(function () {
                     turnPage(-21);
-                },autoscroll);
+                }, autoscroll);
             }
         }
 
-        var turnPage=function(dx){
+        var turnPage = function (dx) {
 
             if (dx > 20) {
                 slideCurPage -= 1;
@@ -156,13 +153,13 @@ $.extend($.fn, {
                 slideCurPage = slideCurPage > countPage ? 1 : slideCurPage;
             }
 
-            $.translate3d(slideObj, -(slideCurPage - 1) * slideWidth);
+            slideObj.translate3d(-(slideCurPage - 1) * slideWidth);
             pageObj.eq(slideCurPage - 1).addClass('active').siblings().removeClass('active');
-            //            console.log(slideCurPage,countPage,dx);
+            //console.log(slideCurPage, countPage, dx);
             autoScrollBanner();
         };
 
-        returnObj=$(this).overSlide({move:false,tap:true},function(dx){
+        returnObj = slideObj.overSlide({move: false, tap: true}, function (dx) {
             turnPage(dx);
         });
 
@@ -170,10 +167,10 @@ $.extend($.fn, {
 
 
         return {
-            next:function(){
+            next: function () {
                 turnPage(-21);
             },
-            prev:function(){
+            prev: function () {
                 turnPage(21);
             }
         };
