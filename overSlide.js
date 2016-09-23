@@ -31,7 +31,7 @@ $.extend($.fn, {
         $this.addClass('bindedEvent').css('width', childsWidth);
         $parent.on('touchstart', function (e) {
             oldDate = new Date();
-            starty = e.originalEvent.touches[0].pageX;
+            starty = e.originalEvent.touches[0].pageY;
             if (!options.move) {
                 startX = e.originalEvent.touches[0].pageX;
             } else {
@@ -46,7 +46,7 @@ $.extend($.fn, {
             dy = endTy - starty;
             var dx2 = Math.abs(dx),
                 dy2 = Math.abs(dy);
-
+            
             //竖向拖动不阻止默认事件
             if ((dy2 > dx2 || dy2 > 10 ) || dx2 < minMove) {
                 return;
