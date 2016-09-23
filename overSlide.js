@@ -120,5 +120,4 @@ $.extend($.fn, {
             oldX = -moveX;
         }
     }
-}
 });
